@@ -75,7 +75,7 @@ void GPU_argv_init()
 }
 
 
-__global__ void atax_kernel1(int nx, int ny, DATA_TYPE *A, DATA_TYPE *x, DATA_TYPE *tmp)
+__global__ void atax_kernel1(int nx, int ny, DATA_TYPE POLYBENCH_2D(A,NX,NY,nx,ny), DATA_TYPE POLYBENCH_1D(x,NY,ny), DATA_TYPE POLYBENCH_1D(tmp,NX,nx))
 {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -85,12 +85,12 @@ __global__ void atax_kernel1(int nx, int ny, DATA_TYPE *A, DATA_TYPE *x, DATA_TY
 		int j;
 		for(j=0; j < _PB_NY; j++)
 		{
-			tmp[i] += A[i*NY+j] * x[j];
+			tmp[i] += A[i][j] * x[j];
 		}
 	}
 }
 
-__global__ void atax_kernel2(int nx, int ny, DATA_TYPE *A, DATA_TYPE *y, DATA_TYPE *tmp)
+__global__ void atax_kernel2(int nx, int ny, DATA_TYPE POLYBENCH_2D(A,NX,NY,nx,ny), DATA_TYPE POLYBENCH_1D(y,NY,ny), DATA_TYPE POLYBENCH_1D(tmp,NX,nx))
 {
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	
@@ -100,7 +100,7 @@ __global__ void atax_kernel2(int nx, int ny, DATA_TYPE *A, DATA_TYPE *y, DATA_TY
 		int i;
 		for(i=0; i < _PB_NX; i++)
 		{
-			y[j] += A[i*NY+j] * tmp[i];
+			y[j] += A[i][j] * tmp[i];
 		}
 	}
 }
@@ -136,7 +136,7 @@ void atax_cpu(int nx, int ny, DATA_TYPE POLYBENCH_2D(A,NX,NY,nx,ny), DATA_TYPE P
 void ataxGpu(int nx, int ny, DATA_TYPE POLYBENCH_2D(A, NX, NY,nx,ny), DATA_TYPE POLYBENCH_1D(x,NX,nx), DATA_TYPE POLYBENCH_1D(y,NY,ny), 
 		DATA_TYPE POLYBENCH_1D(tmp,NX,nx), DATA_TYPE POLYBENCH_1D(y_outputFromGpu,NY,ny))
 {
-	DATA_TYPE *A_gpu;
+	DATA_TYPE (*A_gpu)[NY];
 	DATA_TYPE *x_gpu;
 	DATA_TYPE *y_gpu;
 	DATA_TYPE *tmp_gpu;
@@ -167,7 +167,7 @@ void ataxGpu(int nx, int ny, DATA_TYPE POLYBENCH_2D(A, NX, NY,nx,ny), DATA_TYPE 
 	printf("GPU Time in seconds:\n");
   	polybench_stop_instruments;
  	polybench_print_instruments;
-	
+
 	cudaMemcpy(y_outputFromGpu, y_gpu, sizeof(DATA_TYPE) * NX, cudaMemcpyDeviceToHost);
 
 	cudaFree(A_gpu);
