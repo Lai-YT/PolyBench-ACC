@@ -54,8 +54,17 @@
 # endif
 
 /* Thread block dimensions */
-#define DIM_THREAD_BLOCK_X 32
-#define DIM_THREAD_BLOCK_Y 8
+#ifndef DIM_THREAD_BLOCK_X
+/* Each SM has 4 SMSPs, each of them can handle a warp of 32 threads.
+ * So, to fully utilize the GPU, we need to have at least 128 threads
+ * per block.  */
+#define DIM_THREAD_BLOCK_X 128
+#endif
+#ifndef DIM_THREAD_BLOCK_Y
+/* NOTE: The kernel doesn't use the Y dimension;
+ * not setting it to 1 leads to redundant work being done. */
+#define DIM_THREAD_BLOCK_Y 1
+#endif
 
 
 #endif /* !ATAX*/
