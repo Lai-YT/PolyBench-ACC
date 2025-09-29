@@ -22,6 +22,10 @@
 #include <polybench.h>
 #include <polybenchUtilFuncts.h>
 
+#ifdef RUN_ON_CUBLAS
+#include "atax_cublas.cuh"
+#endif // RUN_ON_CUBLAS
+
 //define the error threshold for the results "not matching"
 #define PERCENT_DIFF_ERROR_THRESHOLD 0.5
 
@@ -210,6 +214,17 @@ int main(int argc, char** argv)
 	GPU_argv_init();
 	ataxGpu(nx, ny, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(x), POLYBENCH_ARRAY(y), POLYBENCH_ARRAY(tmp), 
 		POLYBENCH_ARRAY(y_outputFromGpu));
+
+#ifdef RUN_ON_CUBLAS
+	POLYBENCH_1D_ARRAY_DECL(y_outputFromCublas,DATA_TYPE,NY,ny);
+
+	cublas::ataxGpu(nx, ny, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(x), POLYBENCH_ARRAY(y), POLYBENCH_ARRAY(tmp), 
+		POLYBENCH_ARRAY(y_outputFromCublas));
+
+	compareResults(ny, POLYBENCH_ARRAY(y_outputFromCublas), POLYBENCH_ARRAY(y_outputFromGpu));
+
+	POLYBENCH_FREE_ARRAY(y_outputFromCublas);
+#endif // RUN_ON_CUBLAS
 	
 	#ifdef RUN_ON_CPU
 
