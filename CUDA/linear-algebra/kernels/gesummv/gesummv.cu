@@ -101,7 +101,8 @@ void GPU_argv_init()
 }
 
 
-__global__ void gesummv_kernel(int n, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE* A, DATA_TYPE* B, DATA_TYPE* tmp, DATA_TYPE* x, DATA_TYPE* y)
+__global__ void gesummv_kernel(int n, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE POLYBENCH_2D(A,N,N,n,n), DATA_TYPE POLYBENCH_2D(B,N,N,n,n),
+	DATA_TYPE POLYBENCH_1D(tmp,N,n), DATA_TYPE POLYBENCH_1D(x,N,n), DATA_TYPE POLYBENCH_1D(y,N,n))
 {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -110,8 +111,8 @@ __global__ void gesummv_kernel(int n, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE
 		int j;
 		for(j = 0; j < _PB_N; j++)
 		{	
-			tmp[i] += A[i * N + j] * x[j];
-			y[i] += B[i * N + j] * x[j];
+			tmp[i] += A[i][j] * x[j];
+			y[i] += B[i][j] * x[j];
 		}
 		y[i] = alpha * tmp[i] + beta  * y[i];
 	}
@@ -121,8 +122,8 @@ void gesummvCuda(int n, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE POLYBENCH_2D(
 		DATA_TYPE POLYBENCH_1D(tmp,N,n), DATA_TYPE POLYBENCH_1D(x,N,n), DATA_TYPE POLYBENCH_1D(y,N,n),  
 		DATA_TYPE POLYBENCH_1D(y_outputFromGpu,N,n))
 {
-	DATA_TYPE *A_gpu;
-	DATA_TYPE *B_gpu;
+	DATA_TYPE (*A_gpu)[N];
+	DATA_TYPE (*B_gpu)[N];
 	DATA_TYPE *x_gpu;
 	DATA_TYPE *y_gpu;
 	DATA_TYPE *tmp_gpu;
