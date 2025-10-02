@@ -54,8 +54,12 @@
 # endif
 
 /* Thread block dimensions */
+#ifndef DIM_THREAD_BLOCK_X
 #define DIM_THREAD_BLOCK_X 32
+#endif
+#ifndef DIM_THREAD_BLOCK_Y
 #define DIM_THREAD_BLOCK_Y 8
+#endif
 
 
 #endif /* !SYRK*/
