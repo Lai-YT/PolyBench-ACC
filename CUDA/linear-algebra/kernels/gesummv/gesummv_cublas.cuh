@@ -31,19 +31,16 @@ void gesummvCuda(int nn, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE POLYBENCH_2D
 	DATA_TYPE (*B_gpu)[NN];
 	DATA_TYPE *x_gpu;
 	DATA_TYPE *y_gpu;
-	DATA_TYPE *tmp_gpu;
 
 	cudaMalloc((void **)&A_gpu, sizeof(DATA_TYPE) * NN * NN);
 	cudaMalloc((void **)&B_gpu, sizeof(DATA_TYPE) * NN * NN);
 	cudaMalloc((void **)&x_gpu, sizeof(DATA_TYPE) * NN);
 	cudaMalloc((void **)&y_gpu, sizeof(DATA_TYPE) * NN);
-	cudaMalloc((void **)&tmp_gpu, sizeof(DATA_TYPE) * NN);
 	
 	cudaMemcpy(A_gpu, A, sizeof(DATA_TYPE) * NN * NN, cudaMemcpyHostToDevice);
 	cudaMemcpy(B_gpu, B, sizeof(DATA_TYPE) * NN * NN, cudaMemcpyHostToDevice);
 	cudaMemcpy(x_gpu, x, sizeof(DATA_TYPE) * NN, cudaMemcpyHostToDevice);
 	cudaMemcpy(y_gpu, y, sizeof(DATA_TYPE) * NN, cudaMemcpyHostToDevice);
-	cudaMemcpy(tmp_gpu, tmp, sizeof(DATA_TYPE) * NN, cudaMemcpyHostToDevice);
 
 	dim3 block(DIM_THREAD_BLOCK_X, DIM_THREAD_BLOCK_Y);
 	dim3 grid((unsigned int)ceil( ((float)NN) / ((float)block.x) ), 1);
@@ -76,7 +73,6 @@ void gesummvCuda(int nn, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE POLYBENCH_2D
 	cudaFree(B_gpu);
 	cudaFree(x_gpu);
 	cudaFree(y_gpu);
-	cudaFree(tmp_gpu);
 }
 
 #undef CUBLAS_CHECK
