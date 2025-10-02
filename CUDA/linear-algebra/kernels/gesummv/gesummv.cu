@@ -158,6 +158,12 @@ void gesummvCuda(int n, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE POLYBENCH_2D(
  	polybench_print_instruments;
 
 	cudaMemcpy(y_outputFromGpu, y_gpu, sizeof(DATA_TYPE) * N, cudaMemcpyDeviceToHost);
+
+	cudaFree(A_gpu);
+	cudaFree(B_gpu);
+	cudaFree(x_gpu);
+	cudaFree(y_gpu);
+	cudaFree(tmp_gpu);
 }
 
 
