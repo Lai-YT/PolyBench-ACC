@@ -17,30 +17,30 @@
 # endif
 
 /* Do not define anything if the user manually defines the size. */
-# if !defined(N)
+# if !defined(NN)
 /* Define the possible dataset sizes. */
 #  ifdef MINI_DATASET
-#define N 1024
+#define NN 1024
 #  endif
 
 #  ifdef SMALL_DATASET
-#define N 2048
+#define NN 2048
 #  endif
 
 #  ifdef STANDARD_DATASET /* Default if unspecified. */
-#define N 4096
+#define NN 4096
 #  endif
 
 #  ifdef LARGE_DATASET
-#define N 8192
+#define NN 8192
 #  endif
 
 #  ifdef EXTRALARGE_DATASET
-#define N 16384
+#define NN 16384
 #  endif
-# endif /* !N */
+# endif /* !NN */
 
-# define _PB_N POLYBENCH_LOOP_BOUND(N,n)
+# define _PB_NN POLYBENCH_LOOP_BOUND(NN,nn)
 
 # ifndef DATA_TYPE
 #  define DATA_TYPE float
