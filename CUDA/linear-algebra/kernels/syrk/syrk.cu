@@ -65,7 +65,7 @@ void syrk(int ni, int nj, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE POLYBENCH_2
 	/*  C := alpha*A*A' + beta*C */
 	for (i = 0; i < _PB_NI; i++)
 	{
-		for (j = 0; j < _PB_NI; j++)
+		for (j = 0; j <= i; j++)
 		{
 			C[i][j] *= beta;
 		}
@@ -73,7 +73,7 @@ void syrk(int ni, int nj, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE POLYBENCH_2
 	
 	for (i = 0; i < _PB_NI; i++)
 	{
-		for (j = 0; j < _PB_NI; j++)
+		for (j = 0; j <= i; j++)
 		{
 			for (k = 0; k < _PB_NJ; k++)
 			{
@@ -123,8 +123,10 @@ __global__ void syrk_kernel(int ni, int nj, DATA_TYPE alpha, DATA_TYPE beta, DAT
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	int i = blockIdx.y * blockDim.y + threadIdx.y;
 
-	if ((i < _PB_NI) && (j < _PB_NI))
+	if ((i < _PB_NI) && (j < _PB_NJ))
 	{
+		if (j > i)
+			return;
 		c[i][j] *= beta;
 		int k;		
 		for(k=0; k < _PB_NJ; k++)
