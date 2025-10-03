@@ -22,6 +22,10 @@
 #include <polybench.h>
 #include <polybenchUtilFuncts.h>
 
+#ifdef RUN_ON_CUBLAS
+#include "syrk_cublas.cuh"
+#endif // RUN_ON_CUBLAS
+
 //define the error threshold for the results "not matching"
 #define PERCENT_DIFF_ERROR_THRESHOLD 0.05
 
@@ -203,6 +207,16 @@ int main(int argc, char *argv[])
 	
 	GPU_argv_init();	
 	syrkCuda(ni, nj, alpha, beta, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(C), POLYBENCH_ARRAY(C_outputFromGpu));
+
+#ifdef RUN_ON_CUBLAS
+	POLYBENCH_2D_ARRAY_DECL(C_outputFromCublas,DATA_TYPE,NI,NI,ni,ni);
+
+	cublas::syrkCuda(ni, nj, alpha, beta, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(C), POLYBENCH_ARRAY(C_outputFromCublas));
+
+	compareResults(ni, POLYBENCH_ARRAY(C_outputFromGpu), POLYBENCH_ARRAY(C_outputFromCublas));
+
+	POLYBENCH_FREE_ARRAY(C_outputFromCublas);
+#endif // RUN_ON_CUBLAS
 
 	#ifdef RUN_ON_CPU
 
