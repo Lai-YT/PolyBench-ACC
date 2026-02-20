@@ -120,7 +120,7 @@ void GPU_argv_init()
 
 
 
-__global__ void fdtd_step1_kernel(int nx, int ny, DATA_TYPE* _fict_, DATA_TYPE *ex, DATA_TYPE *ey, DATA_TYPE *hz, int t)
+__global__ void fdtd_step1_kernel(int nx, int ny, DATA_TYPE POLYBENCH_1D(_fict_, TMAX, TMAX), DATA_TYPE POLYBENCH_2D(ex,NX,NY,nx,ny), DATA_TYPE POLYBENCH_2D(ey,NX,NY,nx,ny), DATA_TYPE POLYBENCH_2D(hz,NX,NY,nx,ny), int t)
 {
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	int i = blockIdx.y * blockDim.y + threadIdx.y;
@@ -129,37 +129,37 @@ __global__ void fdtd_step1_kernel(int nx, int ny, DATA_TYPE* _fict_, DATA_TYPE *
 	{
 		if (i == 0) 
 		{
-			ey[i * NY + j] = _fict_[t];
+			ey[i][j] = _fict_[t];
 		}
 		else
 		{ 
-			ey[i * NY + j] = ey[i * NY + j] - 0.5f*(hz[i * NY + j] - hz[(i-1) * NY + j]);
+			ey[i][j] = ey[i][j] - 0.5f*(hz[i][j] - hz[(i-1)][j]);
 		}
 	}
 }
 
 
 
-__global__ void fdtd_step2_kernel(int nx, int ny, DATA_TYPE *ex, DATA_TYPE *ey, DATA_TYPE *hz, int t)
+__global__ void fdtd_step2_kernel(int nx, int ny, DATA_TYPE POLYBENCH_2D(ex,NX,NY,nx,ny), DATA_TYPE POLYBENCH_2D(ey,NX,NY,nx,ny), DATA_TYPE POLYBENCH_2D(hz,NX,NY,nx,ny), int t)
 {
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	int i = blockIdx.y * blockDim.y + threadIdx.y;
 	
 	if ((i < _PB_NX) && (j < _PB_NY) && (j > 0))
 	{
-		ex[i * NY + j] = ex[i * NY + j] - 0.5f*(hz[i * NY + j] - hz[i * NY + (j-1)]);
+		ex[i][j] = ex[i][j] - 0.5f*(hz[i][j] - hz[i][(j-1)]);
 	}
 }
 
 
-__global__ void fdtd_step3_kernel(int nx, int ny, DATA_TYPE *ex, DATA_TYPE *ey, DATA_TYPE *hz, int t)
+__global__ void fdtd_step3_kernel(int nx, int ny, DATA_TYPE POLYBENCH_2D(ex,NX,NY,nx,ny), DATA_TYPE POLYBENCH_2D(ey,NX,NY,nx,ny), DATA_TYPE POLYBENCH_2D(hz,NX,NY,nx,ny), int t)
 {
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	int i = blockIdx.y * blockDim.y + threadIdx.y;
 	
 	if ((i < (_PB_NX-1)) && (j < (_PB_NY-1)))
 	{	
-		hz[i * NY + j] = hz[i * NY + j] - 0.7f*(ex[i * NY + (j+1)] - ex[i * NY + j] + ey[(i + 1) * NY + j] - ey[i * NY + j]);
+		hz[i][j] = hz[i][j] - 0.7f*(ex[i][(j+1)] - ex[i][j] + ey[(i + 1)][j] - ey[i][j]);
 	}
 }
 
@@ -168,9 +168,9 @@ void fdtdCuda(int tmax, int nx, int ny, DATA_TYPE POLYBENCH_1D(_fict_, TMAX, TMA
 	DATA_TYPE POLYBENCH_2D(ey,NX,NY,nx,ny), DATA_TYPE POLYBENCH_2D(hz,NX,NY,nx,ny), DATA_TYPE POLYBENCH_2D(hz_outputFromGpu,NX,NY,nx,ny))
 {
 	DATA_TYPE *_fict_gpu;
-	DATA_TYPE *ex_gpu;
-	DATA_TYPE *ey_gpu;
-	DATA_TYPE *hz_gpu;
+	DATA_TYPE (*ex_gpu)[NY];
+	DATA_TYPE (*ey_gpu)[NY];
+	DATA_TYPE (*hz_gpu)[NY];
 
 	cudaMalloc((void **)&_fict_gpu, sizeof(DATA_TYPE) * TMAX);
 	cudaMalloc((void **)&ex_gpu, sizeof(DATA_TYPE) * NX * NY);
