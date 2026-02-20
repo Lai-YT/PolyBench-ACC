@@ -90,7 +90,7 @@ void GPU_argv_init()
 
 
 //Distributed (split) from initial loop and permuted into reverse order to allow parallelism...
-__global__ void bicg_kernel1(int nx, int ny, DATA_TYPE *A, DATA_TYPE *r, DATA_TYPE *s)
+__global__ void bicg_kernel1(int nx, int ny, DATA_TYPE POLYBENCH_2D(A,NX,NY,nx,ny), DATA_TYPE POLYBENCH_1D(r,NX,nx), DATA_TYPE POLYBENCH_1D(s,NY,ny))
 {
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	
@@ -101,14 +101,14 @@ __global__ void bicg_kernel1(int nx, int ny, DATA_TYPE *A, DATA_TYPE *r, DATA_TY
 		int i;
 		for(i = 0; i < _PB_NX; i++)
 		{
-			s[j] += r[i] * A[i * NY + j];
+			s[j] += r[i] * A[i][j];
 		}
 	}	
 }
 
 
 //Distributed (split) from initial loop to allow parallelism
-__global__ void bicg_kernel2(int nx, int ny, DATA_TYPE *A, DATA_TYPE *p, DATA_TYPE *q)
+__global__ void bicg_kernel2(int nx, int ny, DATA_TYPE POLYBENCH_2D(A,NX,NY,nx,ny), DATA_TYPE POLYBENCH_1D(p,NY,ny), DATA_TYPE POLYBENCH_1D(q,NX,nx))
 {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 	
@@ -119,7 +119,7 @@ __global__ void bicg_kernel2(int nx, int ny, DATA_TYPE *A, DATA_TYPE *p, DATA_TY
 		int j;
 		for(j=0; j < _PB_NY; j++)
 		{
-			q[i] += A[i * NY + j] * p[j];
+			q[i] += A[i][j] * p[j];
 		}
 	}
 }
@@ -173,7 +173,7 @@ void bicgCuda(int nx, int ny, DATA_TYPE POLYBENCH_2D(A,NX,NY,nx,ny), DATA_TYPE P
 	DATA_TYPE POLYBENCH_1D(p,NY,ny), DATA_TYPE POLYBENCH_1D(q,NX,nx), DATA_TYPE POLYBENCH_1D(s_outputFromGpu,NY,ny), 
 	DATA_TYPE POLYBENCH_1D(q_outputFromGpu,NX,nx))
 {
-	DATA_TYPE *A_gpu;
+	DATA_TYPE (*A_gpu)[NY];
 	DATA_TYPE *q_gpu;
 	DATA_TYPE *p_gpu;
 	DATA_TYPE *r_gpu;
