@@ -97,52 +97,52 @@ void GPU_argv_init()
 }
 
 	
-__global__ void mm3_kernel1(int ni, int nj, int nk, int nl, int nm, DATA_TYPE *A, DATA_TYPE *B, DATA_TYPE *E)
+__global__ void mm3_kernel1(int ni, int nj, int nk, int nl, int nm, DATA_TYPE POLYBENCH_2D(A, NI, NK, ni, nk), DATA_TYPE POLYBENCH_2D(B, NK, NJ, nk, nj), DATA_TYPE POLYBENCH_2D(E, NI, NJ, ni, nj))
 {
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	int i = blockIdx.y * blockDim.y + threadIdx.y;
 
 	if ((i < _PB_NI) && (j < _PB_NJ))
 	{
-		E[i * NJ + j] = 0;
+		E[i][j] = 0;
 		int k;
 		for(k=0; k < _PB_NK; k++)
 		{
-			E[i * NJ + j] += A[i * NK + k] * B[k * NJ + j];
+			E[i][j] += A[i][k] * B[k][j];
 		}
 	}
 }
 
 	
-__global__ void mm3_kernel2(int ni, int nj, int nk, int nl, int nm, DATA_TYPE *C, DATA_TYPE *D, DATA_TYPE *F)
+__global__ void mm3_kernel2(int ni, int nj, int nk, int nl, int nm, DATA_TYPE POLYBENCH_2D(C, NJ, NM, nj, nm), DATA_TYPE POLYBENCH_2D(D, NM, NL, nm, nl), DATA_TYPE POLYBENCH_2D(F, NJ, NL, nj, nl))
 {
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	int i = blockIdx.y * blockDim.y + threadIdx.y;
 
 	if ((i < _PB_NJ) && (j < _PB_NL))
 	{
-		F[i * NL + j] = 0;
+		F[i][j] = 0;
 		int k;
 		for(k=0; k < _PB_NM; k++)
 		{
-			F[i * NL + j] += C[i * NM + k] * D[k * NL +j];
+			F[i][j] += C[i][k] * D[k][j];
 		}
 	}
 }
 
 	
-__global__ void mm3_kernel3(int ni, int nj, int nk, int nl, int nm, DATA_TYPE *E, DATA_TYPE *F, DATA_TYPE *G)
+__global__ void mm3_kernel3(int ni, int nj, int nk, int nl, int nm, DATA_TYPE POLYBENCH_2D(E, NI, NJ, ni, nj), DATA_TYPE POLYBENCH_2D(F, NJ, NL, nj, nl), DATA_TYPE POLYBENCH_2D(G, NI, NL, ni, nl))
 {
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	int i = blockIdx.y * blockDim.y + threadIdx.y;
 
 	if ((i < _PB_NI) && (j < _PB_NL))
 	{
-		G[i * NL + j] = 0;
+		G[i][j] = 0;
 		int k;
 		for(k=0; k < _PB_NJ; k++)
 		{
-			G[i * NL + j] += E[i * NJ + k] * F[k * NL + j];
+			G[i][j] += E[i][k] * F[k][j];
 		}
 	}
 }
@@ -211,13 +211,13 @@ void mm3Cuda(int ni, int nj, int nk, int nl, int nm,
 		DATA_TYPE POLYBENCH_2D(G,NI,NL,ni,nl),
 		DATA_TYPE POLYBENCH_2D(G_outputFromGpu,NI,NL,ni,nl))
 {
-	DATA_TYPE *A_gpu;
-	DATA_TYPE *B_gpu;
-	DATA_TYPE *C_gpu;
-	DATA_TYPE *D_gpu;
-	DATA_TYPE *E_gpu;
-	DATA_TYPE *F_gpu;
-	DATA_TYPE *G_gpu;
+	DATA_TYPE (*A_gpu)[NK];
+	DATA_TYPE (*B_gpu)[NJ];
+	DATA_TYPE (*C_gpu)[NM];
+	DATA_TYPE (*D_gpu)[NL];
+	DATA_TYPE (*E_gpu)[NJ];
+	DATA_TYPE (*F_gpu)[NL];
+	DATA_TYPE (*G_gpu)[NL];
 	
 	cudaMalloc((void **)&A_gpu, sizeof(DATA_TYPE) * NI * NK);
 	cudaMalloc((void **)&B_gpu, sizeof(DATA_TYPE) * NK * NJ);
