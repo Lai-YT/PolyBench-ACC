@@ -138,7 +138,7 @@ void GPU_argv_init()
 }
 
 
-__global__ void adi_kernel1(int n, DATA_TYPE* A, DATA_TYPE* B, DATA_TYPE* X)
+__global__ void adi_kernel1(int n, DATA_TYPE POLYBENCH_2D(A,N,N,n,n), DATA_TYPE POLYBENCH_2D(B,N,N,n,n), DATA_TYPE POLYBENCH_2D(X,N,N,n,n))
 {
 	int i1 = blockIdx.x * blockDim.x + threadIdx.x;
 	
@@ -146,25 +146,25 @@ __global__ void adi_kernel1(int n, DATA_TYPE* A, DATA_TYPE* B, DATA_TYPE* X)
 	{
 		for (int i2 = 1; i2 < _PB_N; i2++)
 		{
-			X[i1*N + i2] = X[i1*N + i2] - X[i1*N + (i2-1)] * A[i1*N + i2] / B[i1*N + (i2-1)];
-			B[i1*N + i2] = B[i1*N + i2] - A[i1*N + i2] * A[i1*N + i2] / B[i1*N + (i2-1)];
+			X[i1][i2] = X[i1][i2] - X[i1][(i2-1)] * A[i1][i2] / B[i1][(i2-1)];
+			B[i1][i2] = B[i1][i2] - A[i1][i2] * A[i1][i2] / B[i1][(i2-1)];
 		}
 	}
 }
 
 
-__global__ void adi_kernel2(int n, DATA_TYPE* B, DATA_TYPE* X)
+__global__ void adi_kernel2(int n, DATA_TYPE POLYBENCH_2D(B,N,N,n,n), DATA_TYPE POLYBENCH_2D(X,N,N,n,n))
 {
 	int i1 = blockIdx.x * blockDim.x + threadIdx.x;
 	
 	if ((i1 < _PB_N))
 	{
-		X[i1*N + (N-1)] = X[i1*N + (N-1)] / B[i1*N + (N-1)];
+		X[i1][(N-1)] = X[i1][(N-1)] / B[i1][(N-1)];
 	}
 }
 	
 
-__global__ void adi_kernel3(int n, DATA_TYPE* A, DATA_TYPE* B, DATA_TYPE* X)
+__global__ void adi_kernel3(int n, DATA_TYPE POLYBENCH_2D(A,N,N,n,n), DATA_TYPE POLYBENCH_2D(B,N,N,n,n), DATA_TYPE POLYBENCH_2D(X,N,N,n,n))
 {
 	int i1 = blockIdx.x * blockDim.x + threadIdx.x;
 	
@@ -172,42 +172,42 @@ __global__ void adi_kernel3(int n, DATA_TYPE* A, DATA_TYPE* B, DATA_TYPE* X)
 	{
 		for (int i2 = 0; i2 < _PB_N-2; i2++)
 		{
-			X[i1*N + (N-i2-2)] = (X[i1*N + (N-2-i2)] - X[i1*N + (N-2-i2-1)] * A[i1*N + (N-i2-3)]) / B[i1*N + (N-3-i2)];
+			X[i1][(N-i2-2)] = (X[i1][(N-2-i2)] - X[i1][(N-2-i2-1)] * A[i1][(N-i2-3)]) / B[i1][(N-3-i2)];
 		}
 	}
 }
 
 
-__global__ void adi_kernel4(int n, DATA_TYPE* A, DATA_TYPE* B, DATA_TYPE* X, int i1)
+__global__ void adi_kernel4(int n, DATA_TYPE POLYBENCH_2D(A,N,N,n,n), DATA_TYPE POLYBENCH_2D(B,N,N,n,n), DATA_TYPE POLYBENCH_2D(X,N,N,n,n), int i1)
 {
 	int i2 = blockIdx.x * blockDim.x + threadIdx.x;
 	
 	if (i2 < _PB_N)
 	{
-		X[i1*N + i2] = X[i1*N + i2] - X[(i1-1)*N + i2] * A[i1*N + i2] / B[(i1-1)*N + i2];
-		B[i1*N + i2] = B[i1*N + i2] - A[i1*N + i2] * A[i1*N + i2] / B[(i1-1)*N + i2];
+		X[i1][i2] = X[i1][i2] - X[(i1-1)][i2] * A[i1][i2] / B[(i1-1)][i2];
+		B[i1][i2] = B[i1][i2] - A[i1][i2] * A[i1][i2] / B[(i1-1)][i2];
 	}
 }
 
 
-__global__ void adi_kernel5(int n, DATA_TYPE* B, DATA_TYPE* X)
+__global__ void adi_kernel5(int n, DATA_TYPE POLYBENCH_2D(B,N,N,n,n), DATA_TYPE POLYBENCH_2D(X,N,N,n,n))
 {
 	int i2 = blockIdx.x * blockDim.x + threadIdx.x;
 	
 	if (i2 < _PB_N)
 	{
-		X[(N-1)*N + i2] = X[(N-1)*N + i2] / B[(N-1)*N + i2];
+		X[(N-1)][i2] = X[(N-1)][i2] / B[(N-1)][i2];
 	}
 }
 
 
-__global__ void adi_kernel6(int n, DATA_TYPE* A, DATA_TYPE* B, DATA_TYPE* X, int i1)
+__global__ void adi_kernel6(int n, DATA_TYPE POLYBENCH_2D(A,N,N,n,n), DATA_TYPE POLYBENCH_2D(B,N,N,n,n), DATA_TYPE POLYBENCH_2D(X,N,N,n,n), int i1)
 {
 	int i2 = blockIdx.x * blockDim.x + threadIdx.x;
 	
 	if (i2 < _PB_N)
 	{
-		X[(N-2-i1)*N + i2] = (X[(N-2-i1)*N + i2] - X[(N-i1-3)*N + i2] * A[(N-3-i1)*N + i2]) / B[(N-2-i1)*N + i2];
+		X[(N-2-i1)][i2] = (X[(N-2-i1)][i2] - X[(N-i1-3)][i2] * A[(N-3-i1)][i2]) / B[(N-2-i1)][i2];
 	}
 }
 
@@ -215,9 +215,9 @@ __global__ void adi_kernel6(int n, DATA_TYPE* A, DATA_TYPE* B, DATA_TYPE* X, int
 void adiCuda(int tsteps, int n, DATA_TYPE POLYBENCH_2D(A,N,N,n,n), DATA_TYPE POLYBENCH_2D(B,N,N,n,n), DATA_TYPE POLYBENCH_2D(X,N,N,n,n), 
 	DATA_TYPE POLYBENCH_2D(B_outputFromGpu,N,N,n,n), DATA_TYPE POLYBENCH_2D(X_outputFromGpu,N,N,n,n))
 {
-	DATA_TYPE* A_gpu;
-	DATA_TYPE* B_gpu;
-	DATA_TYPE* X_gpu;
+	DATA_TYPE(* A_gpu)[N];
+	DATA_TYPE(* B_gpu)[N];
+	DATA_TYPE(* X_gpu)[N];
 
 	cudaMalloc(&A_gpu, N * N * sizeof(DATA_TYPE));
 	cudaMalloc(&B_gpu, N * N * sizeof(DATA_TYPE));
