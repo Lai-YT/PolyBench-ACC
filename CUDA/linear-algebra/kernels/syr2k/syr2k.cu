@@ -122,19 +122,19 @@ void GPU_argv_init()
 }
 
 
-__global__ void syr2k_kernel(int ni, int nj, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE *a, DATA_TYPE *b, DATA_TYPE *c)
+__global__ void syr2k_kernel(int ni, int nj, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE POLYBENCH_2D(a, NI, NJ, ni, nj), DATA_TYPE POLYBENCH_2D(b, NI, NJ, ni, nj), DATA_TYPE POLYBENCH_2D(c, NI, NI, ni, ni))
 {
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	int i = blockIdx.y * blockDim.y + threadIdx.y;
 
 	if ((i < NI) && (j < NI))
 	{
-		c[i * NI + j] *= beta;
+		c[i][j] *= beta;
 		
 		int k;
 		for(k = 0; k < NJ; k++)
 		{
-			c[i * NI + j] += alpha * a[i * NJ + k] * b[j * NJ + k] + alpha * b[i * NJ + k] * a[j * NJ + k];
+			c[i][j] += alpha * a[i][k] * b[j][k] + alpha * b[i][k] * a[j][k];
 		}
 	}
 }
@@ -143,9 +143,9 @@ __global__ void syr2k_kernel(int ni, int nj, DATA_TYPE alpha, DATA_TYPE beta, DA
 void syr2kCuda(int ni, int nj, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE POLYBENCH_2D(A, NI, NJ, ni, nj), DATA_TYPE POLYBENCH_2D(B, NI, NJ, ni, nj), 
 		DATA_TYPE POLYBENCH_2D(C, NI, NI, ni, ni), DATA_TYPE POLYBENCH_2D(C_outputFromGpu, NI, NI, ni, ni)) 
 {
-	DATA_TYPE *A_gpu;
-	DATA_TYPE *B_gpu;
-	DATA_TYPE *C_gpu;
+	DATA_TYPE (*A_gpu)[NJ];
+	DATA_TYPE (*B_gpu)[NJ];
+	DATA_TYPE (*C_gpu)[NI];
 
 	cudaMalloc((void **)&A_gpu, sizeof(DATA_TYPE) * NI * NJ);
 	cudaMalloc((void **)&B_gpu, sizeof(DATA_TYPE) * NI * NJ);
