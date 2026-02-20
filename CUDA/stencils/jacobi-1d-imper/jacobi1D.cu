@@ -56,7 +56,7 @@ void runJacobi1DCpu(int tsteps, int n, DATA_TYPE POLYBENCH_1D(A,N,n), DATA_TYPE 
 }
 
 
-__global__ void runJacobiCUDA_kernel1(int n, DATA_TYPE* A, DATA_TYPE* B)
+__global__ void runJacobiCUDA_kernel1(int n, DATA_TYPE POLYBENCH_1D(A,N,n), DATA_TYPE POLYBENCH_1D(B,N,n))
 {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 	
@@ -67,7 +67,7 @@ __global__ void runJacobiCUDA_kernel1(int n, DATA_TYPE* A, DATA_TYPE* B)
 }
 
 
-__global__ void runJacobiCUDA_kernel2(int n, DATA_TYPE* A, DATA_TYPE* B)
+__global__ void runJacobiCUDA_kernel2(int n, DATA_TYPE POLYBENCH_1D(A,N,n), DATA_TYPE POLYBENCH_1D(B,N,n))
 {
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	
