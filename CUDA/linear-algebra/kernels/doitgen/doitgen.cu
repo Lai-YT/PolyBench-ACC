@@ -109,30 +109,30 @@ void GPU_argv_init()
 }
 
 
-__global__ void doitgen_kernel1(int nr, int nq, int np, DATA_TYPE *sum, DATA_TYPE *A, DATA_TYPE *C4, int r)
+__global__ void doitgen_kernel1(int nr, int nq, int np, DATA_TYPE POLYBENCH_3D(sum,NR,NQ,NP,nr,nq,np), DATA_TYPE POLYBENCH_3D(A,NR,NQ,NP,nr,nq,np), DATA_TYPE POLYBENCH_2D(C4,NP,NP,np,np), int r)
 {
 	int p = blockIdx.x * blockDim.x + threadIdx.x;
 	int q = blockIdx.y * blockDim.y + threadIdx.y;
 
 	if ((p < np) && (q < nq))
 	{
-		sum[r * (nq * np) + q * np + p] = (DATA_TYPE)0.0;
+		sum[r][q][p] = (DATA_TYPE)0.0;
 	
 		for (int s = 0; s < np; s++)
 		{
-			sum[r * (nq * np) + q * np + p] = sum[r * (nq * np) + q * np + p] + A[r * (nq * np) + q * np + s] * C4[s * np + p];
+			sum[r][q][p] = sum[r][q][p] + A[r][q][s] * C4[s][p];
 		}
 	}
 }
 
-__global__ void doitgen_kernel2(int nr, int nq, int np, DATA_TYPE *sum, DATA_TYPE *A, DATA_TYPE *C4, int r)
+__global__ void doitgen_kernel2(int nr, int nq, int np, DATA_TYPE POLYBENCH_3D(sum,NR,NQ,NP,nr,nq,np), DATA_TYPE POLYBENCH_3D(A,NR,NQ,NP,nr,nq,np), DATA_TYPE POLYBENCH_2D(C4,NP,NP,np,np), int r)
 {
 	int p = blockIdx.x * blockDim.x + threadIdx.x;
 	int q = blockIdx.y * blockDim.y + threadIdx.y;
 
 	if ((p < np) && (q < nq))
 	{
-		A[r * (nq * np) + q * np + p] = sum[r * (nq * np) + q * np + p];
+		A[r][q][p] = sum[r][q][p];
 	}
 }
 
@@ -141,9 +141,9 @@ void doitgenCuda(int nr, int nq, int np,
 		    DATA_TYPE POLYBENCH_2D(C4,NP,NP,np,np),
 		    DATA_TYPE POLYBENCH_3D(sum_outputFromGpu,NR,NQ,NP,nr,nq,np))
 {
-	DATA_TYPE* AGpu;
-	DATA_TYPE* C4Gpu;
-	DATA_TYPE* sumGpu;
+	DATA_TYPE(* AGpu)[NQ][NP];
+	DATA_TYPE(* C4Gpu)[NP];
+	DATA_TYPE(* sumGpu)[NQ][NP];
 
 	cudaMalloc(&AGpu, nr * nq * np * sizeof(DATA_TYPE));
 	cudaMalloc(&C4Gpu, np * np * sizeof(DATA_TYPE));
