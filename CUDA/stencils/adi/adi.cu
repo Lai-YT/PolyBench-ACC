@@ -153,7 +153,7 @@ __global__ void adi_kernel1(int n, DATA_TYPE* A, DATA_TYPE* B, DATA_TYPE* X)
 }
 
 
-__global__ void adi_kernel2(int n, DATA_TYPE* A, DATA_TYPE* B, DATA_TYPE* X)
+__global__ void adi_kernel2(int n, DATA_TYPE* B, DATA_TYPE* X)
 {
 	int i1 = blockIdx.x * blockDim.x + threadIdx.x;
 	
@@ -190,7 +190,7 @@ __global__ void adi_kernel4(int n, DATA_TYPE* A, DATA_TYPE* B, DATA_TYPE* X, int
 }
 
 
-__global__ void adi_kernel5(int n, DATA_TYPE* A, DATA_TYPE* B, DATA_TYPE* X)
+__global__ void adi_kernel5(int n, DATA_TYPE* B, DATA_TYPE* X)
 {
 	int i2 = blockIdx.x * blockDim.x + threadIdx.x;
 	
@@ -238,7 +238,7 @@ void adiCuda(int tsteps, int n, DATA_TYPE POLYBENCH_2D(A,N,N,n,n), DATA_TYPE POL
 		
 		adi_kernel1<<<grid1, block1>>>(n, A_gpu, B_gpu, X_gpu);
 		cudaDeviceSynchronize();
-		adi_kernel2<<<grid1, block1>>>(n, A_gpu, B_gpu, X_gpu);
+		adi_kernel2<<<grid1, block1>>>(n, B_gpu, X_gpu);
 		cudaDeviceSynchronize();
 		adi_kernel3<<<grid1, block1>>>(n, A_gpu, B_gpu, X_gpu);
 		cudaDeviceSynchronize();
@@ -249,7 +249,7 @@ void adiCuda(int tsteps, int n, DATA_TYPE POLYBENCH_2D(A,N,N,n,n), DATA_TYPE POL
 			cudaDeviceSynchronize();
 		}
 
-		adi_kernel5<<<grid1, block1>>>(n, A_gpu, B_gpu, X_gpu);
+		adi_kernel5<<<grid1, block1>>>(n, B_gpu, X_gpu);
 		cudaDeviceSynchronize();
 		
 		for (int i1 = 0; i1 < _PB_N-2; i1++)
