@@ -36,7 +36,7 @@
 #  endif
 
 #  ifdef EXTRALARGE_DATASET
-#define N 16384
+#define N 24576
 #  endif
 # endif /* !N */
 
