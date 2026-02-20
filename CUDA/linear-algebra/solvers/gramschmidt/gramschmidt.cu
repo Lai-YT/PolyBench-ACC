@@ -119,7 +119,7 @@ void GPU_argv_init()
 }
 
 
-__global__ void gramschmidt_kernel1(int ni, int nj, DATA_TYPE *a, DATA_TYPE *r, int k)
+__global__ void gramschmidt_kernel1(int ni, int nj, DATA_TYPE POLYBENCH_2D(a,NI,NJ,ni,nj), DATA_TYPE POLYBENCH_2D(r,NJ,NJ,nj,nj), int k)
 {
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -129,41 +129,41 @@ __global__ void gramschmidt_kernel1(int ni, int nj, DATA_TYPE *a, DATA_TYPE *r, 
 		int i;
 		for (i = 0; i < _PB_NI; i++)
 		{
-			nrm += a[i * NJ + k] * a[i * NJ + k];
+			nrm += a[i][k] * a[i][k];
 		}
-      		r[k * NJ + k] = sqrt(nrm);
+      		r[k][k] = sqrt(nrm);
 	}
 }
 
 
-__global__ void gramschmidt_kernel2(int ni, int nj, DATA_TYPE *a, DATA_TYPE *r, DATA_TYPE *q, int k)
+__global__ void gramschmidt_kernel2(int ni, int nj, DATA_TYPE POLYBENCH_2D(a,NI,NJ,ni,nj), DATA_TYPE POLYBENCH_2D(r,NJ,NJ,nj,nj), DATA_TYPE POLYBENCH_2D(q,NI,NJ,ni,nj), int k)
 {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 	
 	if (i < _PB_NI)
 	{	
-		q[i * NJ + k] = a[i * NJ + k] / r[k * NJ + k];
+		q[i][k] = a[i][k] / r[k][k];
 	}
 }
 
 
-__global__ void gramschmidt_kernel3(int ni, int nj, DATA_TYPE *a, DATA_TYPE *r, DATA_TYPE *q, int k)
+__global__ void gramschmidt_kernel3(int ni, int nj, DATA_TYPE POLYBENCH_2D(a,NI,NJ,ni,nj), DATA_TYPE POLYBENCH_2D(r,NJ,NJ,nj,nj), DATA_TYPE POLYBENCH_2D(q,NI,NJ,ni,nj), int k)
 {
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 
 	if ((j > k) && (j < _PB_NJ))
 	{
-		r[k*NJ + j] = 0.0;
+		r[k][j] = 0.0;
 
 		int i;
 		for (i = 0; i < _PB_NI; i++)
 		{
-			r[k*NJ + j] += q[i*NJ + k] * a[i*NJ + j];
+			r[k][j] += q[i][k] * a[i][j];
 		}
 		
 		for (i = 0; i < _PB_NI; i++)
 		{
-			a[i*NJ + j] -= q[i*NJ + k] * r[k*NJ + j];
+			a[i][j] -= q[i][k] * r[k][j];
 		}
 	}
 }
@@ -176,9 +176,9 @@ void gramschmidtCuda(int ni, int nj, DATA_TYPE POLYBENCH_2D(A,NI,NJ,ni,nj), DATA
 	dim3 gridKernel2((size_t)ceil(((float)NJ) / ((float)DIM_THREAD_BLOCK_X)), 1);
 	dim3 gridKernel3((size_t)ceil(((float)NJ) / ((float)DIM_THREAD_BLOCK_X)), 1);
 	
-	DATA_TYPE *A_gpu;
-	DATA_TYPE *R_gpu;
-	DATA_TYPE *Q_gpu;
+	DATA_TYPE (*A_gpu)[NJ];
+	DATA_TYPE (*R_gpu)[NJ];
+	DATA_TYPE (*Q_gpu)[NJ];
 
 	cudaMalloc((void **)&A_gpu, sizeof(DATA_TYPE) * NI * NJ);
 	cudaMalloc((void **)&R_gpu, sizeof(DATA_TYPE) * NJ * NJ);
