@@ -16,7 +16,6 @@
 #include <sys/time.h>
 #include <cuda.h>
 
-#define POLYBENCH_TIME 1
 
 #include "3mm.cuh"
 #include <polybench.h>
@@ -27,7 +26,6 @@
 //define the error threshold for the results "not matching"
 #define PERCENT_DIFF_ERROR_THRESHOLD 0.05
 
-#define RUN_ON_CPU
 
 
 void init_array(int ni, int nj, int nk, int nl, int nm, DATA_TYPE POLYBENCH_2D(A, NI, NK, ni, nk), DATA_TYPE POLYBENCH_2D(B, NK, NJ, nk, nj), 

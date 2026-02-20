@@ -16,7 +16,6 @@
 #include <sys/time.h>
 #include <cuda.h>
 
-#define POLYBENCH_TIME 1
 
 #include "mvt.cuh"
 #include <polybench.h>
@@ -27,7 +26,6 @@
 
 #define GPU_DEVICE 0
 
-#define RUN_ON_CPU
 
 
 void init_array(int n, DATA_TYPE POLYBENCH_2D(A, N, N, n, n), DATA_TYPE POLYBENCH_1D(x1, N, n), DATA_TYPE POLYBENCH_1D(x2, N, n), DATA_TYPE POLYBENCH_1D(y1, N, n), DATA_TYPE POLYBENCH_1D(y2, N, n))

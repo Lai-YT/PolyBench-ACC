@@ -17,7 +17,6 @@
 #include <string.h>
 #include <cuda.h>
 
-#define POLYBENCH_TIME 1
 
 #include "doitgen.cuh"
 #include <polybench.h>
@@ -28,7 +27,6 @@
 
 #define GPU_DEVICE 0
 
-#define RUN_ON_CPU
 
 
 

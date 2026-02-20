@@ -15,7 +15,6 @@
 #include <sys/time.h>
 #include <cuda.h>
 
-#define POLYBENCH_TIME 1
 
 #include "bicg.cuh"
 #include <polybench.h>
@@ -30,7 +29,6 @@
 #define M_PI 3.14159
 #endif
 
-#define RUN_ON_CPU
 
 
 void init_array(int nx, int ny, DATA_TYPE POLYBENCH_2D(A,NX,NY,nx,ny), DATA_TYPE POLYBENCH_1D(p,NY,ny), DATA_TYPE POLYBENCH_1D(r,NX,nx))

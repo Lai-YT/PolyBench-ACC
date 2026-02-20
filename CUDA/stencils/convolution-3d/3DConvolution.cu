@@ -17,7 +17,6 @@
 #include <string.h>
 #include <cuda.h>
 
-#define POLYBENCH_TIME 1
 
 #include "3DConvolution.cuh"
 #include <polybench.h>
@@ -28,7 +27,6 @@
 
 #define GPU_DEVICE 0
 
-#define RUN_ON_CPU
 
 
 void conv3D(int ni, int nj, int nk, DATA_TYPE POLYBENCH_3D(A, NI, NJ, NK, ni, nj, nk), DATA_TYPE POLYBENCH_3D(B, NI, NJ, NK, ni, nj, nk))

@@ -16,7 +16,6 @@
 #include <stdarg.h>
 #include <string.h>
 
-#define POLYBENCH_TIME 1
 
 #include "lu.cuh"
 #include <polybench.h>
@@ -27,7 +26,6 @@
 
 #define GPU_DEVICE 0
 
-#define RUN_ON_CPU
 
 
 void lu(int n, DATA_TYPE POLYBENCH_2D(A,N,N,n,n))

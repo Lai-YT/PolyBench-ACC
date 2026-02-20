@@ -17,7 +17,6 @@
 #include <string.h>
 #include <cuda.h>
 
-#define POLYBENCH_TIME 1
 
 #include "gemm.cuh"
 #include <polybench.h>
@@ -28,7 +27,6 @@
 //define the error threshold for the results "not matching"
 #define PERCENT_DIFF_ERROR_THRESHOLD 0.05
 
-#define RUN_ON_CPU
 
 
 void gemm(int ni, int nj, int nk, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE POLYBENCH_2D(A,NI,NK,ni,nk), 

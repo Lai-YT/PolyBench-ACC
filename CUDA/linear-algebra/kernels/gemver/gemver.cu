@@ -17,7 +17,6 @@
 #include <string.h>
 #include <cuda.h>
 
-#define POLYBENCH_TIME 1
 
 #include "gemver.cuh"
 #include <polybench.h>
@@ -28,7 +27,6 @@
 
 #define GPU_DEVICE 0
 
-#define RUN_ON_CPU
 
 
 void gemver(int n, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE POLYBENCH_2D(A, N, N, n, n), DATA_TYPE POLYBENCH_1D(u1, N, n), DATA_TYPE POLYBENCH_1D(v1, N, n), 
