@@ -101,7 +101,7 @@ void GPU_argv_init()
 }
 
 
-__global__ void mvt_kernel1(int n, DATA_TYPE *a, DATA_TYPE *x1, DATA_TYPE *y_1)
+__global__ void mvt_kernel1(int n, DATA_TYPE POLYBENCH_2D(a, N, N, n, n), DATA_TYPE POLYBENCH_1D(x1, N, n), DATA_TYPE POLYBENCH_1D(y_1, N, n))
 {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -110,13 +110,13 @@ __global__ void mvt_kernel1(int n, DATA_TYPE *a, DATA_TYPE *x1, DATA_TYPE *y_1)
 		int j;
 		for(j=0; j < _PB_N; j++)
 		{
-			x1[i] += a[i * N + j] * y_1[j];
+			x1[i] += a[i][j] * y_1[j];
 		}
 	}
 }
 
 
-__global__ void mvt_kernel2(int n, DATA_TYPE *a, DATA_TYPE *x2, DATA_TYPE *y_2)
+__global__ void mvt_kernel2(int n, DATA_TYPE POLYBENCH_2D(a, N, N, n, n), DATA_TYPE POLYBENCH_1D(x2, N, n), DATA_TYPE POLYBENCH_1D(y_2, N, n))
 {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -125,7 +125,7 @@ __global__ void mvt_kernel2(int n, DATA_TYPE *a, DATA_TYPE *x2, DATA_TYPE *y_2)
 		int j;
 		for(j=0; j < _PB_N; j++)
 		{
-			x2[i] += a[j * N + i] * y_2[j];	
+			x2[i] += a[j][i] * y_2[j];	
 		}
 	}
 }
@@ -133,7 +133,7 @@ __global__ void mvt_kernel2(int n, DATA_TYPE *a, DATA_TYPE *x2, DATA_TYPE *y_2)
 void mvtCuda(int n, DATA_TYPE POLYBENCH_2D(a, N, N, n, n), DATA_TYPE POLYBENCH_1D(x1, N, n), DATA_TYPE POLYBENCH_1D(x2, N, n), DATA_TYPE POLYBENCH_1D(y_1, N, n), DATA_TYPE POLYBENCH_1D(y_2, N, n), 
 			DATA_TYPE POLYBENCH_1D(x1_outputFromGpu, N, n), DATA_TYPE POLYBENCH_1D(x2_outputFromGpu, N, n))
 {
-	DATA_TYPE* a_gpu;
+	DATA_TYPE(* a_gpu)[N];
 	DATA_TYPE* x1_gpu;
 	DATA_TYPE* x2_gpu;
 	DATA_TYPE* y_1_gpu;
