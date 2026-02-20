@@ -40,8 +40,8 @@
 #  endif
 
 #  ifdef EXTRALARGE_DATASET
-#define NX 16384
-#define NY 16384
+#define NX 24576
+#define NY 24576
 #  endif
 # endif /* !N */
 
