@@ -129,19 +129,19 @@ void GPU_argv_init()
 }
 
 
-__global__ void gemver_kernel1(int n, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE *a, DATA_TYPE *v1, DATA_TYPE *v2, DATA_TYPE *u1, DATA_TYPE *u2)
+__global__ void gemver_kernel1(int n, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE POLYBENCH_2D(a, N, N, n, n), DATA_TYPE POLYBENCH_1D(v1, N, n), DATA_TYPE POLYBENCH_1D(v2, N, n), DATA_TYPE POLYBENCH_1D(u1, N, n), DATA_TYPE POLYBENCH_1D(u2, N, n))
 {
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	int i = blockIdx.y * blockDim.y + threadIdx.y;
 
 	if ((i < _PB_N) && (j < _PB_N))
 	{
-		a[i * N + j] += u1[i] * v1[j] + u2[i] * v2[j];
+		a[i][j] += u1[i] * v1[j] + u2[i] * v2[j];
 	}
 }
 
 
-__global__ void gemver_kernel2(int n, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE *a, DATA_TYPE *x, DATA_TYPE *y, DATA_TYPE *z)
+__global__ void gemver_kernel2(int n, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE POLYBENCH_2D(a, N, N, n, n), DATA_TYPE POLYBENCH_1D(x, N, n), DATA_TYPE POLYBENCH_1D(y, N, n), DATA_TYPE POLYBENCH_1D(z, N, n))
 {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -150,14 +150,14 @@ __global__ void gemver_kernel2(int n, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE
 		int j;
 		for(j = 0; j < _PB_N; j++) 
 		{
-			x[i] += beta * a[j * N + i] * y[j];
+			x[i] += beta * a[j][i] * y[j];
 		}
 		x[i] += z[i];
 	}
 }
 
 
-__global__ void gemver_kernel3(int n, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE *a, DATA_TYPE *x, DATA_TYPE *w)
+__global__ void gemver_kernel3(int n, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE POLYBENCH_2D(a, N, N, n, n), DATA_TYPE POLYBENCH_1D(x, N, n), DATA_TYPE POLYBENCH_1D(w, N, n))
 {
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 	
@@ -166,7 +166,7 @@ __global__ void gemver_kernel3(int n, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE
 		int j;
 		for(j = 0; j < _PB_N; j++)
 		{ 
-			w[i] += alpha * a[i*N + j] * x[j];
+			w[i] += alpha * a[i][j] * x[j];
 		}
 	}
 }
@@ -184,7 +184,7 @@ void gemverCuda(int n, DATA_TYPE alpha, DATA_TYPE beta,
 		DATA_TYPE POLYBENCH_1D(y,N,n),
 		DATA_TYPE POLYBENCH_1D(z,N,n))
 {
-	DATA_TYPE *A_gpu;
+	DATA_TYPE (*A_gpu)[N];
 	DATA_TYPE *x_gpu;
 	DATA_TYPE *y_gpu;
 	DATA_TYPE *z_gpu;
