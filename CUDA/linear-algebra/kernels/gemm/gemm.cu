@@ -114,18 +114,18 @@ void GPU_argv_init()
 }
 
 
-__global__ void gemm_kernel(int ni, int nj, int nk, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE *a, DATA_TYPE *b, DATA_TYPE *c)
+__global__ void gemm_kernel(int ni, int nj, int nk, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE POLYBENCH_2D(a,NI,NK,ni,nk), DATA_TYPE POLYBENCH_2D(b,NK,NJ,nk,nj), DATA_TYPE POLYBENCH_2D(c,NI,NJ,ni,nj))
 {
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	int i = blockIdx.y * blockDim.y + threadIdx.y;
 
 	if ((i < _PB_NI) && (j < _PB_NJ))
 	{	
-		c[i * NJ + j] *= beta;
+		c[i][j] *= beta;
 		int k;
 		for(k=0; k < _PB_NK; k++)
 		{
-			c[i * NJ + j] += alpha * a[i * NK + k] * b[k * NJ +j];
+			c[i][j] += alpha * a[i][k] * b[k][j];
 		}
 	}
 }
@@ -134,9 +134,9 @@ __global__ void gemm_kernel(int ni, int nj, int nk, DATA_TYPE alpha, DATA_TYPE b
 void gemmCuda(int ni, int nj, int nk, DATA_TYPE alpha, DATA_TYPE beta, DATA_TYPE POLYBENCH_2D(A,NI,NK,ni,nk), 
 	DATA_TYPE POLYBENCH_2D(B,NK,NJ,nk,nj), DATA_TYPE POLYBENCH_2D(C,NI,NJ,ni,nj), DATA_TYPE POLYBENCH_2D(C_outputFromGpu,NI,NJ,ni,nj))
 {
-	DATA_TYPE *A_gpu;
-	DATA_TYPE *B_gpu;
-	DATA_TYPE *C_gpu;
+	DATA_TYPE (*A_gpu)[NK];
+	DATA_TYPE (*B_gpu)[NJ];
+	DATA_TYPE (*C_gpu)[NJ];
 
 	cudaMalloc((void **)&A_gpu, sizeof(DATA_TYPE) * NI * NK);
 	cudaMalloc((void **)&B_gpu, sizeof(DATA_TYPE) * NK * NJ);
