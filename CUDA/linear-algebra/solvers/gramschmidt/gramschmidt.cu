@@ -119,7 +119,7 @@ void GPU_argv_init()
 }
 
 
-__global__ void gramschmidt_kernel1(int ni, int nj, DATA_TYPE *a, DATA_TYPE *r, DATA_TYPE *q, int k)
+__global__ void gramschmidt_kernel1(int ni, int nj, DATA_TYPE *a, DATA_TYPE *r, int k)
 {
 	int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -190,7 +190,7 @@ void gramschmidtCuda(int ni, int nj, DATA_TYPE POLYBENCH_2D(A,NI,NJ,ni,nj), DATA
 	int k;
 	for (k = 0; k < _PB_NJ; k++)
 	{
-		gramschmidt_kernel1<<<gridKernel1,block>>>(ni, nj, A_gpu, R_gpu, Q_gpu, k);
+		gramschmidt_kernel1<<<gridKernel1,block>>>(ni, nj, A_gpu, R_gpu, k);
 		cudaDeviceSynchronize();
 		gramschmidt_kernel2<<<gridKernel2,block>>>(ni, nj, A_gpu, R_gpu, Q_gpu, k);
 		cudaDeviceSynchronize();
