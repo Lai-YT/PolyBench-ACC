@@ -93,32 +93,32 @@ void GPU_argv_init()
 }
 
 
-__global__ void lu_kernel1(int n, DATA_TYPE *A, int k)
+__global__ void lu_kernel1(int n, DATA_TYPE POLYBENCH_2D(A,N,N,n,n), int k)
 {
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	
 	if ((j > k) && (j < _PB_N))
 	{
-		A[k*N + j] = A[k*N + j] / A[k*N + k];
+		A[k][j] = A[k][j] / A[k][k];
 	}
 }
 
 
-__global__ void lu_kernel2(int n, DATA_TYPE *A, int k)
+__global__ void lu_kernel2(int n, DATA_TYPE POLYBENCH_2D(A,N,N,n,n), int k)
 {
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
 	int i = blockIdx.y * blockDim.y + threadIdx.y;
 	
 	if ((i > k) && (j > k) && (i < _PB_N) && (j < _PB_N))
 	{
-		A[i*N + j] = A[i*N + j] - A[i*N + k] * A[k*N + j];
+		A[i][j] = A[i][j] - A[i][k] * A[k][j];
 	}
 }
 
 
 void luCuda(int n, DATA_TYPE POLYBENCH_2D(A,N,N,n,n), DATA_TYPE POLYBENCH_2D(A_outputFromGpu,N,N,n,n))
 {
-	DATA_TYPE* AGpu;
+	DATA_TYPE(* AGpu)[N];
 
 	cudaMalloc(&AGpu, N * N * sizeof(DATA_TYPE));
 	cudaMemcpy(AGpu, A, N * N * sizeof(DATA_TYPE), cudaMemcpyHostToDevice);
