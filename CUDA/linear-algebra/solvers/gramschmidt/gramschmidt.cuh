@@ -40,8 +40,8 @@
 #  endif
 
 #  ifdef EXTRALARGE_DATASET
-#define NI 8192
-#define NJ 8192
+#define NI 16384
+#define NJ 16384
 #  endif
 # endif /* !N */
 
